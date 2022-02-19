@@ -2,6 +2,7 @@ package db;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.Statement;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -9,7 +10,7 @@ import javax.sql.DataSource;
 
 public class JdbcUtil {
 	
-	public Connection getConnection() {
+	public static Connection getConnection() {
 		
 		Connection con = null;
 		
@@ -43,6 +44,15 @@ public class JdbcUtil {
 	
 		try {
 			rs.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void close(Statement stmt) {
+		
+		try {
+			stmt.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
