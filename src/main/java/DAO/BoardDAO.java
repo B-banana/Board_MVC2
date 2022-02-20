@@ -139,5 +139,69 @@ public class BoardDAO {
 	}
 
 	// 글 등록
+	public int insertArticle(BoardBean article) {
+
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		int num = 0;
+		String sql = "";
+		int insertCount = 0;
+
+		try {
+			pstmt = con.prepareStatement("select max(board_num) form board"); // 마지막 글 셀렉트
+			rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+				num = rs.getInt(1) + 1; // 새로운 글을 그 다음 번호
+			} else {
+				num = 1; // 첫번째 글일 경우
+			}
+
+			sql = "insert into board (BOARD_NUM, BOARD_NAME, BOARD_PASS, BOARD_SUBJECT, "
+					+ "BOARD_CONTENT, BOARD_FILE, BOARD_RE_REF, BOARD_RE_LEV, BOARD_RE_SEQ, BOARD_READCOUNT, BOARD_DATE) "
+					+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now())";
+
+			pstmt = con.prepareStatement(sql);
+			pstmt.setInt(1, num);
+			pstmt.setString(2, article.getBOARD_NAME());
+			pstmt.setString(3, article.getBOARD_PASS());
+			pstmt.setString(4, article.getBOARD_SUBJECT());
+			pstmt.setString(5, article.getBOARD_CONTENT());
+			pstmt.setString(6, article.getBOARD_FILE());
+			pstmt.setInt(7, num);
+			pstmt.setInt(8, 0);
+			pstmt.setInt(9, 0);
+			pstmt.setInt(10, 0);
+
+			insertCount = pstmt.executeUpdate();
+
+		} catch (Exception e) {
+			System.out.println("boardInsert 에러 : " + e);
+		} finally {
+			close(rs);
+			close(pstmt);
+		}
+		return insertCount;
+	}
+	
+	//조회수 업데이트
+	public int updateReadCount(int board_num) {
+		
+		PreparedStatement pstmt = null;
+		int updateCount = 0;
+		
+		String sql = "update board set BOARD_READCOUNT = BOARD_READCOUNT + 1 where BOARD_NUM = " + board_num;
+		
+		try {
+			pstmt = con.prepareStatement(sql);
+			updateCount = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			System.out.println("setReadCountUpdate 에러 : " + e);
+		} finally {
+			close(pstmt);
+		}
+		return updateCount;
+	}
 
 }
